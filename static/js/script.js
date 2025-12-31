@@ -1,0 +1,665 @@
+/*
+ * IGCSE Grade Calculator - JavaScript
+ * Phase 3: Interactive Form Logic (Linear Structure)
+ * Developed by Sachin V with Perplexity AI
+ */
+
+// ========== CONFIGURATION DATA ==========
+
+const YEAR_SEASONS = {
+    '2019': ['November 2019'],
+    '2020': ['March 2020', 'June 2020', 'November 2020'],
+    '2021': ['March 2021', 'June 2021', 'November 2021'],
+    '2022': ['March 2022', 'June 2022', 'November 2022'],
+    '2023': ['March 2023', 'June 2023', 'November 2023'],
+    '2024': ['March 2024', 'June 2024', 'November 2024'],
+    '2025': ['March 2025', 'June 2025']
+};
+
+const SUBJECT_PAPERS = {
+    '0610': {
+        name: 'Biology',
+        hasTypes: true,
+        extended: ['2', '4', '6'],
+        core: ['1', '3', '5']
+    },
+    '0620': {
+        name: 'Chemistry',
+        hasTypes: true,
+        extended: ['2', '4', '6'],
+        core: ['1', '3', '5']
+    },
+    '0625': {
+        name: 'Physics',
+        hasTypes: true,
+        extended: ['2', '4', '6'],
+        core: ['1', '3', '5']
+    },
+    '0580': {
+        name: 'Mathematics',
+        hasTypes: true,
+        extended: ['2', '4'],
+        core: ['1', '3']
+    },
+    '0500': {
+        name: 'English',
+        hasTypes: false,
+        papers: ['1', '2']
+    },
+    '0478': {
+        name: 'Computer Science',
+        hasTypes: false,
+        papers: ['1', '2']
+    }
+};
+
+const VARIANTS = ['1', '2', '3'];
+
+// ========== GLOBAL STATE ==========
+let selectedComponents = [];
+
+// ========== MASTER VALIDATION & UPDATE FUNCTION ==========
+
+function validateAndUpdateForm() {
+    const subject = document.getElementById('subject').value;
+    const year = document.getElementById('year').value;
+    const season = document.getElementById('season').value;
+    const paperType = document.getElementById('paperType').value;
+
+    console.log(`Validating: Subject=${subject}, Year=${year}, Season=${season}, Type=${paperType}`);
+
+    const hasBasicInfo = subject && year && season;
+
+    if (!hasBasicInfo) {
+        hideFromStep(4);
+        return;
+    }
+
+    const subjectData = SUBJECT_PAPERS[subject];
+
+    if (subjectData.hasTypes) {
+        document.getElementById('typeSelection').style.display = 'block';
+
+        if (!paperType) {
+            hideFromStep(5);
+            return;
+        }
+    } else {
+        document.getElementById('typeSelection').style.display = 'none';
+    }
+
+    generateComponentSelectors();
+}
+
+// ========== HIDE FUNCTIONS ==========
+
+function hideFromStep(step) {
+    if (step <= 4) {
+        document.getElementById('typeSelection').style.display = 'none';
+    }
+    if (step <= 5) {
+        document.getElementById('componentSelection').style.display = 'none';
+    }
+    if (step <= 6) {
+        document.getElementById('markInputs').style.display = 'none';
+    }
+    if (step <= 7) {
+        document.getElementById('result').style.display = 'none';
+    }
+}
+
+// ========== POPULATE SEASONS ==========
+
+function populateSeasons() {
+    const yearSelect = document.getElementById('year');
+    const seasonSelect = document.getElementById('season');
+    const selectedYear = yearSelect.value;
+
+    const currentSeason = seasonSelect.value;
+
+    seasonSelect.innerHTML = '<option value="">-- Select season --</option>';
+
+    if (selectedYear && YEAR_SEASONS[selectedYear]) {
+        const seasons = YEAR_SEASONS[selectedYear];
+        seasons.forEach(season => {
+            const option = document.createElement('option');
+            option.value = season;
+            option.textContent = season;
+            seasonSelect.appendChild(option);
+        });
+
+        if (currentSeason && seasons.includes(currentSeason)) {
+            seasonSelect.value = currentSeason;
+        }
+    }
+
+    validateAndUpdateForm();
+}
+
+// ========== GENERATE COMPONENT SELECTORS ==========
+
+function generateComponentSelectors() {
+    const subjectSelect = document.getElementById('subject');
+    const typeSelect = document.getElementById('paperType');
+    const componentSelectionDiv = document.getElementById('componentSelection');
+    const componentOptionsDiv = document.getElementById('componentOptions');
+
+    const selectedSubject = subjectSelect.value;
+    const selectedType = typeSelect.value;
+    const subjectData = SUBJECT_PAPERS[selectedSubject];
+
+    let papers = [];
+    if (subjectData.hasTypes) {
+        papers = subjectData[selectedType];
+    } else {
+        papers = subjectData.papers;
+    }
+
+    console.log(`Generating component selectors for papers: ${papers}`);
+
+    componentOptionsDiv.innerHTML = '';
+
+    papers.forEach(paper => {
+        const div = document.createElement('div');
+        div.style.marginBottom = '10px';
+
+        const label = document.createElement('label');
+        label.textContent = `Paper ${paper} - Select Variant: `;
+        label.style.display = 'inline-block';
+        label.style.width = '200px';
+
+        const select = document.createElement('select');
+        select.id = `component_${paper}`;
+        select.className = 'component-selector';
+        select.required = true;
+
+        const defaultOption = document.createElement('option');
+        defaultOption.value = '';
+        defaultOption.textContent = '-- Select Variant --';
+        select.appendChild(defaultOption);
+
+        VARIANTS.forEach(variant => {
+            const option = document.createElement('option');
+            option.value = paper + variant;
+            option.textContent = `Variant ${variant} (${paper}${variant})`;
+            select.appendChild(option);
+        });
+
+        select.addEventListener('change', checkAllComponentsSelected);
+
+        div.appendChild(label);
+        div.appendChild(select);
+        componentOptionsDiv.appendChild(div);
+    });
+
+    componentSelectionDiv.style.display = 'block';
+    document.getElementById('markInputs').style.display = 'none';
+}
+
+// ========== CHECK ALL COMPONENTS SELECTED ==========
+
+function checkAllComponentsSelected() {
+    const subjectSelect = document.getElementById('subject');
+    const typeSelect = document.getElementById('paperType');
+    const selectedSubject = subjectSelect.value;
+    const selectedType = typeSelect.value;
+    const subjectData = SUBJECT_PAPERS[selectedSubject];
+
+    let papers = [];
+    if (subjectData.hasTypes) {
+        papers = subjectData[selectedType];
+    } else {
+        papers = subjectData.papers;
+    }
+
+    selectedComponents = [];
+    let allSelected = true;
+
+    papers.forEach(paper => {
+        const select = document.getElementById(`component_${paper}`);
+        if (select && select.value) {
+            selectedComponents.push(select.value);
+        } else {
+            allSelected = false;
+        }
+    });
+
+    console.log(`Components: ${selectedComponents}, All selected: ${allSelected}`);
+
+    if (allSelected) {
+        generateMarkInputs();
+    } else {
+        document.getElementById('markInputs').style.display = 'none';
+    }
+}
+
+// ========== GENERATE MARK INPUTS ==========
+
+function generateMarkInputs() {
+    const markInputsDiv = document.getElementById('markInputs');
+    const markFieldsDiv = document.getElementById('markFields');
+
+    markFieldsDiv.innerHTML = '';
+
+    console.log(`Generating mark inputs for: ${selectedComponents}`);
+
+    selectedComponents.forEach(component => {
+        const div = document.createElement('div');
+        div.style.marginBottom = '10px';
+
+        const label = document.createElement('label');
+        label.textContent = `Component ${component}: `;
+        label.style.display = 'inline-block';
+        label.style.width = '200px';
+
+        const input = document.createElement('input');
+        input.type = 'number';
+        input.id = `mark_${component}`;
+        input.placeholder = 'Enter marks';
+        input.min = '0';
+        input.step = '1';
+        input.required = true;
+        input.style.width = '150px';
+
+        div.appendChild(label);
+        div.appendChild(input);
+        markFieldsDiv.appendChild(div);
+    });
+
+    markInputsDiv.style.display = 'block';
+}
+
+// ========== DISPLAY ERROR ==========
+
+function displayError(errorMessage) {
+    const resultDiv = document.getElementById('result');
+    const resultDetailsDiv = document.getElementById('resultDetails');
+
+    resultDiv.style.display = 'block';
+    resultDetailsDiv.innerHTML = `
+        <div class="error-card">
+            <h3>❌ Error</h3>
+            <p>${errorMessage}</p>
+            <button onclick="location.reload()">Try Again</button>
+        </div>
+    `;
+    resultDiv.scrollIntoView({ behavior: 'smooth' });
+}
+
+// ========== DISPLAY RESULTS ==========
+
+function displayResults(result) {
+    const resultDetailsDiv = document.getElementById('resultDetails');
+
+    let html = `
+        <div class="result-card">
+            <h3>🎓 Your Result</h3>
+            
+            <div class="grade-display">
+                <strong>Grade:</strong> <span>${result.grade}</span>
+            </div>
+            
+            ${result.pum ? `
+                <div class="pum-display">
+                    <strong>PUM:</strong> <span>${result.pum}%</span>
+                </div>
+                
+                <div class="result-slip">
+                    <strong>Result Slip Format:</strong> ${result.grade} (${result.pum})
+                </div>
+            ` : ''}
+            
+            <div style="margin-top: 15px;">
+                <strong>Syllabus Total:</strong> ${result.syllabus_total} / ${result.max_total}
+            </div>
+            
+            ${result.option ? `
+                <div style="margin-top: 10px; font-size: 0.9em; color: #666;">
+                    <strong>Grade Threshold Option:</strong> ${result.option}
+                </div>
+            ` : ''}
+        </div>
+        
+        <div>
+            <h4>📊 Component Breakdown</h4>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Component</th>
+                        <th>Raw Mark</th>
+                        <th>SCWF</th>
+                        <th>Weighted Mark</th>
+                    </tr>
+                </thead>
+                <tbody>
+    `;
+
+    result.details.forEach(detail => {
+        html += `
+            <tr>
+                <td>${detail.Component}</td>
+                <td>${detail['Raw Mark']} / ${detail['Max Raw']}</td>
+                <td>${detail.SCWF}</td>
+                <td>${detail['Weighted Mark']} / ${detail['Max Weighted']}</td>
+            </tr>
+        `;
+    });
+
+    html += `
+                </tbody>
+            </table>
+        </div>
+        
+        ${result.thresholds ? `
+            <div>
+                <h4>📈 Grade Thresholds</h4>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Grade</th>
+                            <th>A*</th>
+                            <th>A</th>
+                            <th>B</th>
+                            <th>C</th>
+                            <th>D</th>
+                            <th>E</th>
+                            <th>F</th>
+                            <th>G</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Threshold</strong></td>
+                            <td>${result.thresholds['A*'] || '-'}</td>
+                            <td>${result.thresholds['A'] || '-'}</td>
+                            <td>${result.thresholds['B'] || '-'}</td>
+                            <td>${result.thresholds['C'] || '-'}</td>
+                            <td>${result.thresholds['D'] || '-'}</td>
+                            <td>${result.thresholds['E'] || '-'}</td>
+                            <td>${result.thresholds['F'] || '-'}</td>
+                            <td>${result.thresholds['G'] || '-'}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+` : ''}
+        
+        <button class="btn-calculate-another" onclick="location.reload()">
+            Calculate Another Grade
+        </button>
+    `;
+
+    resultDetailsDiv.innerHTML = html;
+    document.getElementById('result').scrollIntoView({ behavior: 'smooth' });
+}
+
+// ========== EVENT LISTENERS ==========
+
+document.addEventListener('DOMContentLoaded', function () {
+    console.log('Calculator JavaScript loaded successfully!');
+
+    document.getElementById('subject').addEventListener('change', validateAndUpdateForm);
+    document.getElementById('year').addEventListener('change', populateSeasons);
+    document.getElementById('season').addEventListener('change', validateAndUpdateForm);
+    document.getElementById('paperType').addEventListener('change', validateAndUpdateForm);
+
+    // ========== FORM SUBMISSION ==========
+
+    document.getElementById('calculatorForm').addEventListener('submit', async function (e) {
+        e.preventDefault();
+
+        console.log('Form submitted!');
+
+        const subject = document.getElementById('subject').value;
+        const season = document.getElementById('season').value;
+
+        // ========== VALIDATION ==========
+        let validationErrors = [];
+        let rawMarks = [];
+
+        selectedComponents.forEach(component => {
+            const markInput = document.getElementById(`mark_${component}`);
+            const value = markInput.value.trim();
+
+            if (value === '') {
+                validationErrors.push(`Component ${component}: Please enter a mark`);
+                return;
+            }
+
+            const mark = parseFloat(value);
+
+            if (isNaN(mark)) {
+                validationErrors.push(`Component ${component}: Please enter a valid number`);
+                return;
+            }
+
+            if (mark < 0) {
+                validationErrors.push(`Component ${component}: Mark cannot be negative`);
+                return;
+            }
+
+            // Check decimal places
+            if (mark % 1 !== 0) {
+                const decimals = value.split('.')[1];
+                if (decimals && decimals.length > 2) {
+                    validationErrors.push(`Component ${component}: Maximum 2 decimal places`);
+                }
+            }
+
+            rawMarks.push(mark);
+        });
+
+        // Display validation errors if any
+        if (validationErrors.length > 0) {
+            displayError(validationErrors.join('<br>'));
+            return;
+        }
+
+        // ========== PREPARE AND SEND DATA ==========
+
+        const requestData = {
+            subject_code: subject,
+            exam_series: season,
+            components: selectedComponents,
+            raw_marks: rawMarks
+        };
+
+        console.log('Sending to Flask:', requestData);
+
+        // Show loading message
+        const resultDiv = document.getElementById('result');
+        const resultDetailsDiv = document.getElementById('resultDetails');
+        resultDiv.style.display = 'block';
+        resultDetailsDiv.innerHTML = '<p>Calculating your grade... ⏳</p>';
+
+        try {
+            const response = await fetch('/calculate', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(requestData)
+            });
+
+            const result = await response.json();
+            console.log('Flask response:', result);
+
+            if (result.success) {
+                displayResults(result);
+
+                // Trigger celebration for A* grade
+                if (result.grade === 'A*') {
+                    setTimeout(() => {
+                        triggerAStarCelebration();
+                    }, 500); // Small delay for result to appear first
+                }
+            }
+            else {
+                displayError(result.error);
+            }
+
+        } catch (error) {
+            console.error('Error:', error);
+            displayError('Network error. Please check if Flask is running.');
+        }
+    });
+});
+
+// ========== MANUAL MODE FUNCTIONALITY ==========
+
+// Mode switching
+document.getElementById('databaseModeBtn').addEventListener('click', function () {
+    document.getElementById('databaseModeBtn').classList.add('active');
+    document.getElementById('manualModeBtn').classList.remove('active');
+    document.getElementById('calculatorForm').style.display = 'block';
+    document.getElementById('manualModeForm').style.display = 'none';
+    document.getElementById('modeDescription').textContent = 'Using pre-loaded grade thresholds and SCWF data from Cambridge';
+});
+
+document.getElementById('manualModeBtn').addEventListener('click', function () {
+    document.getElementById('manualModeBtn').classList.add('active');
+    document.getElementById('databaseModeBtn').classList.remove('active');
+    document.getElementById('calculatorForm').style.display = 'none';
+    document.getElementById('manualModeForm').style.display = 'block';
+    document.getElementById('modeDescription').textContent = 'Manually enter SCWF values and thresholds for custom calculations';
+});
+
+// Generate component inputs for manual mode
+document.getElementById('numComponents').addEventListener('change', function () {
+    const numComponents = parseInt(this.value);
+    const container = document.getElementById('customComponentInputs');
+    const thresholdsSection = document.getElementById('customThresholds');
+
+    container.innerHTML = '';
+
+    if (!numComponents) {
+        thresholdsSection.style.display = 'none';
+        return;
+    }
+
+    // Create components in a 2-column grid
+    for (let i = 1; i <= numComponents; i++) {
+        const div = document.createElement('div');
+        div.className = 'component-input-group';
+        div.innerHTML = `
+            <h4>Component ${i}</h4>
+            <div class="compact-grid">
+                <div>
+                    <label>Component Code</label>
+                    <input type="text" id="custom_comp_${i}" placeholder="e.g., 21" required>
+                </div>
+                <div>
+                    <label>SCWF</label>
+                    <input type="number" id="custom_scwf_${i}" placeholder="e.g., 1.25" min="0" step="0.01" required>
+                </div>
+                <div>
+                    <label>Your Mark</label>
+                    <input type="number" id="custom_mark_${i}" placeholder="e.g., 54" min="0" step="0.5" required>
+                </div>
+                <div>
+                    <label>Max Raw Mark</label>
+                    <input type="number" id="custom_maxraw_${i}" placeholder="e.g., 80" min="1" required>
+                </div>
+            </div>
+        `;
+        container.appendChild(div);
+    }
+
+    thresholdsSection.style.display = 'block';
+});
+
+// Handle custom form submission
+document.getElementById('customCalculatorForm').addEventListener('submit', async function (e) {
+    e.preventDefault();
+
+    const numComponents = parseInt(document.getElementById('numComponents').value);
+
+    // Collect component data
+    const components = [];
+    const marks = [];
+    let scwfData = [];
+
+    for (let i = 1; i <= numComponents; i++) {
+        const comp = document.getElementById(`custom_comp_${i}`).value;
+        const mark = parseFloat(document.getElementById(`custom_mark_${i}`).value);
+        const maxRaw = parseFloat(document.getElementById(`custom_maxraw_${i}`).value);
+        const scwf = parseFloat(document.getElementById(`custom_scwf_${i}`).value);
+
+        // Auto-calculate Max Weighted Mark
+        const maxWeighted = maxRaw * scwf;
+
+        components.push(comp);
+        marks.push(mark);
+        scwfData.push({
+            Component: comp,
+            'Max Raw Mark': maxRaw,
+            'Max Weighted Mark': maxWeighted,  // Calculated automatically
+            SCWF: scwf
+        });
+    }
+
+    // Collect thresholds
+    const thresholds = {};
+    const grades = ['A*', 'A', 'B', 'C', 'D', 'E', 'F', 'G'];
+    grades.forEach(grade => {
+        const input = document.getElementById(`threshold_${grade}`);
+        if (input.value) {
+            thresholds[grade] = parseFloat(input.value);
+        }
+    });
+
+    // Validate at least one threshold
+    if (Object.keys(thresholds).length === 0) {
+        displayError('Please enter at least one grade threshold');
+        return;
+    }
+
+    const requestData = {
+        subject_code: 'CUSTOM',
+        exam_series: document.getElementById('customSeries').value || 'Custom',
+        components: components,
+        raw_marks: marks,
+        custom_scwf: scwfData,
+        custom_thresholds: thresholds
+    };
+
+    console.log('Sending custom calculation:', requestData);
+
+    // Show loading
+    const resultDiv = document.getElementById('result');
+    const resultDetailsDiv = document.getElementById('resultDetails');
+    resultDiv.style.display = 'block';
+    resultDetailsDiv.innerHTML = '<p>Calculating your grade... ⏳</p>';
+
+    try {
+        const response = await fetch('/calculate_custom', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(requestData)
+        });
+
+        const result = await response.json();
+        console.log('Flask response:', result);
+
+        if (result.success) {
+            displayResults(result);
+
+            // Trigger celebration for A* grade
+            if (result.grade === 'A*') {
+                setTimeout(() => {
+                    triggerAStarCelebration();
+                }, 500); // Small delay for result to appear first
+            }
+        } else {
+            displayError(result.error);
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        displayError('Network error. Please check if Flask is running.');
+    }
+});
+
+
+
+console.log('Script.js loaded!');
+

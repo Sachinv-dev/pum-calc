@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BoardMarks: IGCSE Grade Calculator</title>
+    <link rel="icon" type="image/png" href="/static/images/icon.png">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+<body>
+    <div class="container">
+        <!-- Header -->
+        <h1>🎓 BoardMarks</h1>
+        <p class="subtitle">
+            Got your marks?
+            <em>Put them to the test.</em>
+        </p>
+
+        <!-- ========== MODE SELECTOR ========== -->
+        <div class="mode-selector">
+            <button type="button" id="databaseModeBtn" class="mode-btn active">📚 Database Mode</button>
+            <button type="button" id="manualModeBtn" class="mode-btn">✏️ Manual Mode</button>
+        </div>
+        
+        <p class="mode-description" id="modeDescription">
+            Using pre-loaded grade thresholds and SCWF data from Cambridge (for select subjects)
+        </p>
+
+        <!-- Calculator Form -->
+        <form id="calculatorForm">
+
+            <!-- Subject Selection -->
+            <div>
+                <label for="subject">Select your subject:</label>
+                <select id="subject" required>
+                    <option value="">-- Select Subject --</option>
+                    <option value="0580">Mathematics (0580)</option>
+                    <option value="0610">Biology (0610)</option>
+                    <option value="0620">Chemistry (0620)</option>
+                    <option value="0625">Physics (0625)</option>
+                    <option value="0500">English (0500)</option>
+                    <option value="0478">Computer Science (0478)</option>
+                </select>
+            </div>
+
+            <!-- Year Selection -->
+            <div>
+                <label for="year">Select your year:</label>
+                <select id="year" required>
+                    <option value="">-- Select Year --</option>
+                    <option value="2019">2019</option>
+                    <option value="2020">2020</option>
+                    <option value="2021">2021</option>
+                    <option value="2022">2022</option>
+                    <option value="2023">2023</option>
+                    <option value="2024">2024</option>
+                    <option value="2025">2025</option>
+                </select>
+            </div>
+
+            <!-- Season Selection -->
+            <div>
+                <label for="season">Select your season:</label>
+                <select id="season" required>
+                    <option value="">-- Select year first --</option>
+                </select>
+            </div>
+
+            <!-- Extended/Core Selection -->
+            <div id="typeSelection" style="display: none;">
+                <label for="paperType">Select paper type:</label>
+                <select id="paperType">
+                    <option value="">-- Select Type --</option>
+                    <option value="extended">Extended</option>
+                    <option value="core">Core</option>
+                </select>
+            </div>
+
+            <!-- Component Selection -->
+            <div id="componentSelection" style="display: none;">
+                <p>📝 Select your component variants:</p>
+                <div id="componentOptions">
+                    <!-- JavaScript generates component dropdowns here -->
+                </div>
+            </div>
+
+            <!-- Mark Inputs -->
+            <div id="markInputs" style="display: none;">
+                <p>✏️ Enter your marks for each component:</p>
+                <div id="markFields">
+                    <!-- JavaScript generates mark input fields here -->
+                </div>
+
+                <!-- Submit Button -->
+                <button type="submit">Calculate My Grade</button>
+            </div>
+
+        </form>
+        
+        <!-- ========== MANUAL MODE FORM ========== -->
+        <div id="manualModeForm" style="display: none;">
+            <form id="customCalculatorForm">
+                <h3>📝 Custom Calculation</h3>
+                <p style="opacity: 0.8; margin-bottom: 30px;">
+                    Enter your own SCWF values and grade thresholds for subjects/series not in the database.
+                </p>
+
+                <!-- Basic Info -->
+                <label for="customSubject">Subject Name (Optional)</label>
+                <input type="text" id="customSubject" placeholder="e.g., Economics, History">
+
+                <label for="customSeries">Exam Series (Optional)</label>
+                <input type="text" id="customSeries" placeholder="e.g., June 2025">
+
+                <!-- Number of Components -->
+                <label for="numComponents">Number of Components</label>
+                <select id="numComponents" required>
+                    <option value="">-- Select --</option>
+                    <option value="2">2 Components</option>
+                    <option value="3">3 Components</option>
+                    <option value="4">4 Components</option>
+                </select>
+
+                <!-- Dynamic Component Inputs -->
+                <div id="customComponentInputs"></div>
+
+                <!-- Grade Thresholds -->
+                <div id="customThresholds" style="display: none;">
+                    <h4>Grade Thresholds</h4>
+                    <p style="opacity: 0.7; font-size: 0.9em; margin-bottom: 15px;">
+                        Enter the minimum marks required for each grade
+                    </p>
+
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px;">
+                        <div>
+                            <label>A*</label>
+                            <input type="number" id="threshold_A*" placeholder="e.g., 180">
+                        </div>
+                        <div>
+                            <label>A</label>
+                            <input type="number" id="threshold_A" placeholder="e.g., 160">
+                        </div>
+                        <div>
+                            <label>B</label>
+                            <input type="number" id="threshold_B" placeholder="e.g., 140">
+                        </div>
+                        <div>
+                            <label>C</label>
+                            <input type="number" id="threshold_C" placeholder="e.g., 120" required>
+                        </div>
+                        <div>
+                            <label>D</label>
+                            <input type="number" id="threshold_D" placeholder="e.g., 100">
+                        </div>
+                        <div>
+                            <label>E</label>
+                            <input type="number" id="threshold_E" placeholder="e.g., 80">
+                        </div>
+                        <div>
+                            <label>F</label>
+                            <input type="number" id="threshold_F" placeholder="e.g., 60">
+                        </div>
+                        <div>
+                            <label>G</label>
+                            <input type="number" id="threshold_G" placeholder="e.g., 40">
+                        </div>
+                    </div>
+
+                    <p style="opacity: 0.6; font-size: 0.85em; margin-top: 15px;">
+                        💡 Leave grades empty if not applicable (e.g., Core tier doesn't have A* or A)
+                    </p>
+                </div>
+
+                <button type="submit">Calculate Grade</button>
+            </form>
+        </div>
+
+        <!-- Result Display Area -->
+        <div id="result" style="display: none;">
+            <h2>Your Result</h2>
+            <div id="resultDetails">
+                <!-- JavaScript displays results here -->
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer>
+            <p>Developed by Sachin V, with Perplexity AI</p>
+        </footer>
+    </div>
+
+            <!-- Shooting Stars (12 meteors) -->
+          <!---  <div class="shooting-star shooting-star-1"></div>
+            <div class="shooting-star shooting-star-2"></div>
+            <div class="shooting-star shooting-star-3"></div>
+            <div class="shooting-star shooting-star-4"></div>
+            <div class="shooting-star shooting-star-5"></div>
+            <div class="shooting-star shooting-star-6"></div>
+            <div class="shooting-star shooting-star-7"></div>
+            <div class="shooting-star shooting-star-8"></div>
+            <div class="shooting-star shooting-star-9"></div>
+            <div class="shooting-star shooting-star-10"></div>
+            <div class="shooting-star shooting-star-11"></div>
+            <div class="shooting-star shooting-star-12"></div> --->
+            
+            <!-- Terrain Strip -->
+            <div class="terrain-strip">
+                <img src="{{ url_for('static', filename='images/footbar.png') }}" alt="Observatory Terrain">
+            </div>
+            
+            <!-- JavaScript -->
+            <script src="{{ url_for('static', filename='js/stars.js') }}"></script>
+            <script src="{{ url_for('static', filename='js/meteors.js') }}"></script>
+            <script src="{{ url_for('static', filename='js/terrain-glow.js') }}"></script>
+            <script src="{{ url_for('static', filename='js/celebration.js') }}"></script>
+            <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+            
+            
+
+</body>
+
+</html>

@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 120" fill="#000000">
+  <!-- Tripod legs -->
+  <polygon points="50,95 35,118 37,120 52,97"/>
+  <polygon points="50,95 65,118 63,120 48,97"/>
+  <polygon points="50,95 48,120 52,120 52,97"/>
+  
+  <!-- Tripod center joint -->
+  <circle cx="50" cy="95" r="6"/>
+  
+  <!-- Mount base -->
+  <rect x="44" y="75" width="12" height="20" rx="2"/>
+  
+  <!-- Telescope tube main body -->
+  <ellipse cx="50" cy="42" rx="9" ry="33" fill="#000"/>
+  
+  <!-- Telescope eyepiece (bottom) -->
+  <ellipse cx="50" cy="75" rx="7" ry="8"/>
+  <circle cx="50" cy="75" r="4" fill="#1a1a1a"/>
+  
+  <!-- Telescope objective lens (top) -->
+  <ellipse cx="50" cy="9" rx="11" ry="9"/>
+  <circle cx="50" cy="9" r="7" fill="#1a1a1a"/>
+  <circle cx="50" cy="9" r="4" fill="#2a2a2a"/>
+  
+  <!-- Finder scope -->
+  <rect x="41" y="30" width="3" height="20" rx="1"/>
+  <circle cx="42.5" cy="28" r="3"/>
+  <circle cx="42.5" cy="51" r="2.5"/>
+  
+  <!-- Focus knob -->
+  <circle cx="59" cy="42" r="4"/>
+  <circle cx="59" cy="42" r="2" fill="#1a1a1a"/>
+</svg>

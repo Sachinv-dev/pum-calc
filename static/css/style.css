@@ -1,0 +1,801 @@
+/*
+ * IGCSE Grade Calculator - Night Sky Observatory
+ * Enhanced starry night with shooting stars and observatory terrain
+ * Developed by Sachin V with Perplexity AI
+ */
+
+/* ========== FONTS ========== */
+
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Recursive:wght@400;600;700&display=swap');
+
+/* ========== ROOT VARIABLES ========== */
+
+:root {
+    --sky-dark: #0d0d14;
+    --terrain-dark: #050508;
+    --fg-light: #e8e8e8;
+    --accent-gold: #d4af37;
+    --star-white: #ffffff;
+    --border: rgba(255, 255, 255, 0.12);
+    --card-bg: rgba(13, 13, 20, 0.2);
+}
+
+/* ========== GLOBAL RESET ========== */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Recursive', 'JetBrains Mono', monospace;
+    background: var(--sky-dark);
+    color: var(--fg-light);
+    line-height: 1.7;
+    padding: 40px 20px 180px 20px;
+    min-height: 100vh;
+    position: relative;
+    overflow-x: hidden;
+}
+
+.container {
+    max-width: 900px;
+    margin: 0 auto;
+    background: var(--card-bg);
+    backdrop-filter: blur(25px);
+    border: 1px solid var(--border);
+    padding: 60px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.7);
+    position: relative;
+    margin-bottom: 40px;
+    animation: emergeFromTop 1.2s ease-out;
+}
+
+@keyframes emergeFromTop {
+    from {
+        opacity: 0;
+        transform: translateY(-50px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ========== TERRAIN STRIP WITH SCROLL-ACTIVATED GLOW ========== */
+
+.terrain-strip {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: auto;
+    z-index: 1000;
+    pointer-events: none;
+    animation: riseFromBottom 1.2s ease-out;
+}
+
+.terrain-strip::before {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 200px;
+    background: linear-gradient(to top,
+            rgba(255, 255, 255, 0.10) 0%,
+            rgba(255, 255, 255, 0.18) 25%,
+            rgba(255, 255, 255, 0.14) 50%,
+            rgba(255, 255, 255, 0.06) 75%,
+            transparent 100%);
+    filter: blur(40px);
+    pointer-events: none;
+    z-index: 1;
+    opacity: 0;
+    transition: opacity 0.5s ease;
+}
+
+
+
+.terrain-strip img {
+    width: 100%;
+    height: auto;
+    display: block;
+    margin: 0;
+    padding: 0;
+    position: relative;
+    z-index: 2;
+}
+
+@keyframes riseFromBottom {
+    0% {
+        transform: translateY(100%);
+        opacity: 0;
+    }
+
+    100% {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+/* ========== HEADER ========== */
+
+h1 {
+    font-family: 'Recursive', monospace;
+    font-size: 2.8em;
+    font-weight: 700;
+    color: var(--fg-light);
+    margin-bottom: 10px;
+    letter-spacing: -1px;
+}
+
+.subtitle {
+    font-size: 1em;
+    color: var(--fg-light);
+    opacity: 0.75;
+    margin-bottom: 50px;
+    padding-bottom: 30px;
+    border-bottom: 1px solid var(--border);
+    line-height: 1.8;
+}
+
+.subtitle em {
+    font-style: normal;
+    color: var(--accent-gold);
+    font-weight: 600;
+    opacity: 1;
+}
+
+.subtitle strong {
+    font-weight: 600;
+    opacity: 1;
+}
+
+/* ========== FORM ELEMENTS ========== */
+
+label {
+    display: block;
+    font-weight: 600;
+    font-size: 0.9em;
+    color: var(--fg-light);
+    opacity: 0.7;
+    margin-bottom: 8px;
+    text-transform: lowercase;
+}
+
+/* ========== INPUT GROUPS (SUBTLE GOLD) ========== */
+
+.input-group {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 16px;
+    background: linear-gradient(135deg,
+            rgba(255, 215, 100, 0.03) 0%,
+            rgba(255, 215, 100, 0.08) 50%,
+            rgba(255, 215, 100, 0.03) 100%);
+    border-radius: 6px;
+    margin-bottom: 10px;
+    border: 1px solid rgba(255, 215, 100, 0.15);
+    transition: all 0.3s ease;
+}
+
+.input-group:hover {
+    background: linear-gradient(135deg,
+            rgba(255, 215, 100, 0.05) 0%,
+            rgba(255, 215, 100, 0.12) 50%,
+            rgba(255, 215, 100, 0.05) 100%);
+    border-color: rgba(255, 215, 100, 0.25);
+}
+
+select,
+input[type="number"] {
+    width: 100%;
+    padding: 16px;
+    font-family: 'Recursive', monospace;
+    font-size: 1em;
+    border: 1px solid var(--border);
+    background: rgba(0, 0, 0, 0.25);
+    color: var(--fg-light);
+    margin-bottom: 28px;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+}
+
+select:focus,
+input[type="number"]:focus {
+    outline: none;
+    border-color: rgba(255, 255, 255, 0.3);
+    box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.15);
+}
+
+select:hover,
+input[type="number"]:hover {
+    border-color: rgba(255, 255, 255, 0.25);
+}
+
+select option {
+    background: #0d0d14;
+    color: var(--fg-light);
+}
+
+/* ========== SECTIONS ========== */
+
+#typeSelection,
+#componentSelection,
+#markInputs {
+    margin-top: 30px;
+    padding: 28px;
+    background: rgba(0, 0, 0, 0.15);
+    backdrop-filter: blur(10px);
+    border: 1px solid var(--border);
+}
+
+#componentSelection p,
+#markInputs p {
+    font-weight: 600;
+    font-size: 0.9em;
+    color: var(--fg-light);
+    margin-bottom: 20px;
+    opacity: 0.85;
+}
+
+#componentOptions>div,
+#markFields>div {
+    display: grid;
+    grid-template-columns: 220px 1fr;
+    gap: 16px;
+    align-items: center;
+    margin-bottom: 16px;
+}
+
+#componentOptions label,
+#markFields label {
+    font-size: 0.95em;
+    margin-bottom: 0;
+}
+
+#componentOptions select,
+#markFields input {
+    margin-bottom: 0;
+}
+
+/* ========== BUTTON ========== */
+
+button[type="submit"] {
+    width: 100%;
+    padding: 20px;
+    font-family: 'Recursive', monospace;
+    font-size: 1em;
+    font-weight: 700;
+    background: rgba(255, 255, 255, 0.9);
+    color: #0a0a0e;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-top: 30px;
+}
+
+button[type="submit"]:hover {
+    background: white;
+    box-shadow: 0 0 30px rgba(255, 255, 255, 0.3);
+}
+
+button[type="submit"]:active {
+    transform: scale(0.98);
+}
+
+/* ========== RESULT SECTION ========== */
+
+#result {
+    margin-top: 60px;
+    border-top: 1px solid var(--border);
+    padding-top: 60px;
+    background: linear-gradient(135deg,
+            rgba(255, 215, 100, 0.10) 0%,
+            rgba(255, 215, 100, 0.15) 100%);
+    padding: 50px 40px;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 215, 100, 0.2);
+}
+
+#result h2 {
+    font-family: 'Recursive', monospace;
+    font-size: 2em;
+    color: var(--fg-light);
+    margin-bottom: 30px;
+    font-weight: 700;
+}
+
+/* ========== RESULT CARD (MORE OPAQUE GOLD) ========== */
+
+.result-card {
+    background: linear-gradient(135deg,
+            rgba(255, 215, 100, 0.08) 0%,
+            rgba(255, 215, 100, 0.12) 100%);
+    backdrop-filter: blur(10px);
+    border: 2px solid rgba(255, 215, 100, 0.3);
+    padding: 35px;
+    margin-bottom: 40px;
+    border-radius: 8px;
+}
+
+.result-card h3 {
+    font-family: 'Recursive', monospace;
+    font-size: 1.3em;
+    color: var(--fg-light);
+    margin-bottom: 25px;
+    font-weight: 700;
+}
+
+/* ========== GRADE & PUM DISPLAY (MOST OPAQUE GOLD) ========== */
+
+.grade-display,
+.pum-display {
+    font-size: 1.1em;
+    margin-bottom: 16px;
+    font-weight: 500;
+    padding: 18px 24px;
+    background: linear-gradient(135deg,
+            rgba(255, 215, 100, 0.15) 0%,
+            rgba(255, 215, 100, 0.22) 50%,
+            rgba(255, 215, 100, 0.15) 100%);
+    border-radius: 8px;
+    border: 2px solid rgba(255, 215, 100, 0.4);
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.grade-display:hover,
+.pum-display:hover {
+    background: linear-gradient(135deg,
+            rgba(255, 215, 100, 0.18) 0%,
+            rgba(255, 215, 100, 0.25) 50%,
+            rgba(255, 215, 100, 0.18) 100%);
+    border-color: rgba(255, 215, 100, 0.5);
+    box-shadow: 0 4px 12px rgba(255, 215, 100, 0.15);
+}
+
+.grade-display strong,
+.pum-display strong {
+    color: var(--fg-light);
+    opacity: 0.85;
+    font-weight: 600;
+}
+
+.grade-display span,
+.pum-display span {
+    font-size: 2.2em;
+    font-weight: 700;
+    color: var(--fg-light);
+    font-family: 'Recursive', monospace;
+}
+
+.result-slip {
+    background: rgba(255, 215, 100, 0.08);
+    border: 1px solid rgba(255, 215, 100, 0.25);
+    padding: 18px;
+    margin-top: 20px;
+    font-size: 1em;
+    border-radius: 6px;
+}
+
+.result-slip strong {
+    color: var(--fg-light);
+    opacity: 0.8;
+    font-weight: 600;
+}
+
+/* ========== TABLES ========== */
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    font-size: 0.95em;
+    border: 1px solid var(--border);
+    background: rgba(0, 0, 0, 0.15);
+    backdrop-filter: blur(10px);
+}
+
+thead {
+    border-bottom: 2px solid var(--border);
+}
+
+th {
+    padding: 16px;
+    text-align: left;
+    font-weight: 600;
+    color: var(--fg-light);
+    font-size: 0.85em;
+}
+
+td {
+    padding: 16px;
+    border-bottom: 1px solid var(--border);
+    color: var(--fg-light);
+}
+
+tbody tr:last-child td {
+    border-bottom: none;
+}
+
+tbody tr:hover {
+    background: rgba(255, 255, 255, 0.02);
+}
+
+th:last-child,
+td:last-child {
+    text-align: right;
+}
+
+/* ========== SECTION HEADERS ========== */
+
+h4 {
+    font-family: 'Recursive', monospace;
+    font-size: 1.2em;
+    color: var(--fg-light);
+    margin: 50px 0 20px 0;
+    font-weight: 700;
+}
+
+/* ========== CALCULATE ANOTHER BUTTON ========== */
+
+.btn-calculate-another {
+    display: block;
+    width: 100%;
+    max-width: 400px;
+    margin: 40px auto 0;
+    padding: 18px;
+    font-family: 'Recursive', monospace;
+    font-size: 0.95em;
+    font-weight: 700;
+    background: transparent;
+    color: var(--fg-light);
+    border: 2px solid rgba(255, 255, 255, 0.25);
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-calculate-another:hover {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.4);
+}
+
+/* ========== ERROR CARD ========== */
+
+.error-card {
+    background: rgba(0, 0, 0, 0.3);
+    backdrop-filter: blur(10px);
+    border: 2px solid #d63031;
+    padding: 35px;
+    text-align: center;
+}
+
+.error-card h3 {
+    font-family: 'Recursive', monospace;
+    color: #ff6b6b;
+    margin-bottom: 18px;
+    font-size: 1.3em;
+}
+
+.error-card p {
+    color: var(--fg-light);
+    opacity: 0.8;
+    margin-bottom: 24px;
+}
+
+.error-card button {
+    background: #d63031;
+    color: var(--fg-light);
+    border: none;
+    padding: 16px 32px;
+    font-family: 'Recursive', monospace;
+    font-size: 0.95em;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.error-card button:hover {
+    background: #ff6b6b;
+}
+
+/* ========== FOOTER ========== */
+
+footer {
+    margin-top: 60px;
+    padding-top: 30px;
+    border-top: 1px solid var(--border);
+    text-align: center;
+    font-size: 0.9em;
+    color: var(--fg-light);
+    opacity: 0.5;
+}
+
+/* ========== RESPONSIVE ========== */
+
+@media (max-width: 768px) {
+    body {
+        padding: 20px 10px 160px 10px;
+    }
+
+    .container {
+        padding: 30px 20px;
+    }
+
+    #result {
+        padding: 30px 20px;
+    }
+
+    h1 {
+        font-size: 2.2em;
+    }
+
+    #componentOptions>div,
+    #markFields>div {
+        grid-template-columns: 1fr;
+        gap: 8px;
+    }
+
+    table {
+        font-size: 0.85em;
+        display: block;
+        overflow-x: auto;
+        white-space: nowrap;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    th,
+    td {
+        padding: 12px 10px;
+    }
+
+    .terrain-strip {
+        height: 120px;
+    }
+}
+
+@media (max-width: 480px) {
+    h1 {
+        font-size: 1.8em;
+    }
+
+    .subtitle {
+        font-size: 0.9em;
+    }
+
+    .container {
+        padding: 25px 15px;
+    }
+
+    #result {
+        padding: 25px 15px;
+    }
+
+    .result-card {
+        padding: 25px 15px;
+    }
+}
+
+/* ========== MODE SELECTOR ========== */
+
+.mode-selector {
+    display: flex;
+    gap: 10px;
+    margin: 30px 0 15px 0;
+    border-bottom: 2px solid var(--border);
+    padding-bottom: 0;
+}
+
+.mode-btn {
+    flex: 1;
+    padding: 15px 20px;
+    font-family: 'Recursive', monospace;
+    font-size: 0.95em;
+    font-weight: 600;
+    background: transparent;
+    color: var(--fg-light);
+    opacity: 0.5;
+    border: none;
+    border-bottom: 3px solid transparent;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-bottom: -2px;
+}
+
+.mode-btn:hover {
+    opacity: 0.8;
+}
+
+.mode-btn.active {
+    opacity: 1;
+    border-bottom-color: var(--accent-gold);
+}
+
+.mode-description {
+    font-size: 0.9em;
+    opacity: 0.7;
+    margin-bottom: 30px;
+    padding: 15px;
+    background: rgba(255, 215, 100, 0.05);
+    border-left: 3px solid var(--accent-gold);
+    border-radius: 4px;
+}
+
+/* ========== CUSTOM FORM COMPACT LAYOUT ========== */
+
+#customComponentInputs {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+    margin-bottom: 20px;
+}
+
+#customComponentInputs .component-input-group {
+    background: rgba(0, 0, 0, 0.15);
+    border: 1px solid var(--border);
+    padding: 20px;
+    border-radius: 6px;
+}
+
+#customComponentInputs .component-input-group h4 {
+    margin: 0 0 15px 0;
+    font-size: 1em;
+    color: var(--accent-gold);
+}
+
+.compact-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+}
+
+.compact-grid>div {
+    display: flex;
+    flex-direction: column;
+}
+
+/* Single column on mobile */
+@media (max-width: 768px) {
+    #customComponentInputs {
+        grid-template-columns: 1fr;
+    }
+
+    .compact-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* ========== THRESHOLD GRID ========== */
+
+#customThresholds {
+    margin-top: 40px;
+    padding: 25px;
+    background: rgba(0, 0, 0, 0.15);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+}
+
+#customThresholds h4 {
+    margin-top: 0;
+}
+
+#customThresholds>div:nth-child(3) {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 15px;
+}
+
+@media (max-width: 768px) {
+    #customThresholds>div:nth-child(3) {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+/* ========== CUSTOM FORM INPUT STYLES ========== */
+
+#customComponentInputs input[type="text"],
+#customComponentInputs input[type="number"],
+#customThresholds input[type="number"] {
+    width: 100%;
+    padding: 12px;
+    font-family: 'Recursive', monospace;
+    font-size: 0.95em;
+    border: 1px solid var(--border);
+    background: rgba(0, 0, 0, 0.25);
+    color: var(--fg-light);
+    margin-bottom: 0;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+}
+
+#customComponentInputs input:focus,
+#customThresholds input:focus {
+    outline: none;
+    border-color: rgba(255, 255, 255, 0.3);
+    box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.15);
+}
+
+#customComponentInputs label,
+#customThresholds label {
+    display: block;
+    font-weight: 600;
+    font-size: 0.85em;
+    color: var(--fg-light);
+    opacity: 0.7;
+    margin-bottom: 6px;
+    text-transform: lowercase;
+}
+
+/* ========== MANUAL MODE TOP FIELDS ========== */
+
+#manualModeForm input[type="text"] {
+    width: 100%;
+    padding: 16px;
+    font-family: 'Recursive', monospace;
+    font-size: 1em;
+    border: 1px solid var(--border);
+    background: rgba(0, 0, 0, 0.25);
+    color: var(--fg-light);
+    margin-bottom: 28px;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+}
+
+#manualModeForm input[type="text"]:focus {
+    outline: none;
+    border-color: rgba(255, 255, 255, 0.3);
+    box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.15);
+}
+
+#manualModeForm input[type="text"]:hover {
+    border-color: rgba(255, 255, 255, 0.25);
+}
+
+#manualModeForm select {
+    width: 100%;
+    padding: 16px;
+    font-family: 'Recursive', monospace;
+    font-size: 1em;
+    border: 1px solid var(--border);
+    background: rgba(0, 0, 0, 0.25);
+    color: var(--fg-light);
+    margin-bottom: 28px;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+}
+
+#manualModeForm select:focus {
+    outline: none;
+    border-color: rgba(255, 255, 255, 0.3);
+    box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.15);
+}
+
+#manualModeForm select:hover {
+    border-color: rgba(255, 255, 255, 0.25);
+}
+
+#manualModeForm select option {
+    background: #0d0d14;
+    color: var(--fg-light);
+}
+
+#manualModeForm h3 {
+    font-family: 'Recursive', monospace;
+    font-size: 1.5em;
+    color: var(--fg-light);
+    margin-bottom: 10px;
+    font-weight: 700;
+}
+
+#manualModeForm>form>p {
+    opacity: 0.8;
+    margin-bottom: 30px;
+    line-height: 1.6;
+}

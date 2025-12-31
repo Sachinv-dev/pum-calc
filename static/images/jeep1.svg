@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 70" fill="#000000">
+  <!-- Body base -->
+  <rect x="20" y="35" width="80" height="22" rx="2"/>
+  
+  <!-- Hood -->
+  <rect x="12" y="40" width="15" height="14" rx="1"/>
+  
+  <!-- Cabin -->
+  <polygon points="45,25 45,35 85,35 85,25 75,18 55,18"/>
+  
+  <!-- Windshield -->
+  <rect x="48" y="22" width="15" height="10" fill="#1a1a1a" opacity="0.6"/>
+  
+  <!-- Side window -->
+  <rect x="68" y="27" width="14" height="8" fill="#1a1a1a" opacity="0.6"/>
+  
+  <!-- Front wheel -->
+  <circle cx="35" cy="57" r="10" fill="#000"/>
+  <circle cx="35" cy="57" r="5" fill="#1a1a1a"/>
+  
+  <!-- Rear wheel -->
+  <circle cx="85" cy="57" r="10" fill="#000"/>
+  <circle cx="85" cy="57" r="5" fill="#1a1a1a"/>
+  
+  <!-- Roof rack -->
+  <rect x="46" y="16" width="2" height="2"/>
+  <rect x="58" y="16" width="2" height="2"/>
+  <rect x="70" y="16" width="2" height="2"/>
+  
+  <!-- Bumper -->
+  <rect x="5" y="45" width="7" height="3" rx="1"/>
+  <rect x="100" y="45" width="7" height="3" rx="1"/>
+  
+  <!-- Spare tire (back) -->
+  <circle cx="105" cy="43" r="7" fill="#000"/>
+  <circle cx="105" cy="43" r="4" fill="#1a1a1a"/>
+  
+  <!-- Door line -->
+  <line x1="65" y1="35" x2="65" y2="57" stroke="#1a1a1a" stroke-width="1.5"/>
+</svg>
