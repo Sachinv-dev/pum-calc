@@ -618,21 +618,35 @@ document.addEventListener('DOMContentLoaded', function () {
 // ========== MANUAL MODE FUNCTIONALITY ==========
 
 // Mode switching
-document.getElementById('databaseModeBtn').addEventListener('click', function () {
-    document.getElementById('databaseModeBtn').classList.add('active');
-    document.getElementById('manualModeBtn').classList.remove('active');
-    document.getElementById('calculatorForm').style.display = 'block';
-    document.getElementById('manualModeForm').style.display = 'none';
-    document.getElementById('modeDescription').textContent = 'Using pre-loaded grade thresholds and SCWF data from Cambridge';
+// ========== APPLE-STYLE TOGGLE FUNCTIONALITY ========== 
+document.querySelectorAll('.toggle-option').forEach(button => {
+    button.addEventListener('click', function() {
+        const mode = this.getAttribute('data-mode');
+        const modeToggle = document.querySelector('.mode-toggle');
+        
+        // Update active states
+        document.querySelectorAll('.toggle-option').forEach(btn => {
+            btn.classList.remove('active');
+        });
+        this.classList.add('active');
+        
+        // Animate slider
+        if (mode === 'manual') {
+            modeToggle.classList.add('manual-active');
+            document.getElementById('calculatorForm').style.display = 'none';
+            document.getElementById('manualModeForm').style.display = 'block';
+            document.getElementById('modeDescription').textContent = 
+                'Manually enter SCWF values and thresholds for custom calculations';
+        } else {
+            modeToggle.classList.remove('manual-active');
+            document.getElementById('calculatorForm').style.display = 'block';
+            document.getElementById('manualModeForm').style.display = 'none';
+            document.getElementById('modeDescription').textContent = 
+                'Using pre-loaded grade thresholds and SCWF data from Cambridge (for select subjects)';
+        }
+    });
 });
 
-document.getElementById('manualModeBtn').addEventListener('click', function () {
-    document.getElementById('manualModeBtn').classList.add('active');
-    document.getElementById('databaseModeBtn').classList.remove('active');
-    document.getElementById('calculatorForm').style.display = 'none';
-    document.getElementById('manualModeForm').style.display = 'block';
-    document.getElementById('modeDescription').textContent = 'Manually enter SCWF values and thresholds for custom calculations';
-});
 
 // Generate component inputs for manual mode
 document.getElementById('numComponents').addEventListener('change', function () {
