@@ -33,7 +33,7 @@ body {
     background: var(--sky-dark);
     color: var(--fg-light);
     line-height: 1.7;
-    padding: 40px 20px 180px 20px;
+    padding: 30px 20px 120px 20px;
     min-height: 100vh;
     position: relative;
     overflow-x: hidden;
@@ -45,7 +45,7 @@ body {
     background: var(--card-bg);
     backdrop-filter: blur(25px);
     border: 1px solid var(--border);
-    padding: 60px;
+    padding: 40px;
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.7);
     position: relative;
     margin-bottom: 40px;
@@ -522,11 +522,11 @@ footer {
 
 @media (max-width: 768px) {
     body {
-        padding: 20px 10px 160px 10px;
+        padding: 20px 10px 100px 10px;
     }
-
+    
     .container {
-        padding: 30px 20px;
+        padding: 25px 15px;
     }
 
     #result {
@@ -571,7 +571,7 @@ footer {
     }
 
     .container {
-        padding: 25px 15px;
+        padding: 20px 12px;
     }
 
     #result {
