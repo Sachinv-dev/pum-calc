@@ -17,41 +17,42 @@ const YEAR_SEASONS = {
 };
 
 const SUBJECT_PAPERS = {
-    '0610': {
-        name: 'Biology',
+    '0610': { 
+        name: 'Biology', 
         hasTypes: true,
-        extended: ['2', '4', '6'],
-        core: ['1', '3', '5']
+        extended: { mcq: '2', theory: '4', practical: ['5', '6'] },
+        core: { mcq: '1', theory: '3', practical: ['5', '6'] }
     },
-    '0620': {
-        name: 'Chemistry',
+    '0620': { 
+        name: 'Chemistry', 
         hasTypes: true,
-        extended: ['2', '4', '6'],
-        core: ['1', '3', '5']
+        extended: { mcq: '2', theory: '4', practical: ['5', '6'] },
+        core: { mcq: '1', theory: '3', practical: ['5', '6'] }
     },
-    '0625': {
-        name: 'Physics',
+    '0625': { 
+        name: 'Physics', 
         hasTypes: true,
-        extended: ['2', '4', '6'],
-        core: ['1', '3', '5']
+        extended: { mcq: '2', theory: '4', practical: ['5', '6'] },
+        core: { mcq: '1', theory: '3', practical: ['5', '6'] }
     },
-    '0580': {
-        name: 'Mathematics',
+    '0580': { 
+        name: 'Mathematics', 
         hasTypes: true,
         extended: ['2', '4'],
         core: ['1', '3']
     },
-    '0500': {
-        name: 'English',
+    '0500': { 
+        name: 'English', 
         hasTypes: false,
         papers: ['1', '2']
     },
-    '0478': {
-        name: 'Computer Science',
+    '0478': { 
+        name: 'Computer Science', 
         hasTypes: false,
         papers: ['1', '2']
     }
 };
+
 
 const VARIANTS = ['1', '2', '3'];
 
@@ -141,38 +142,76 @@ function populateSeasons() {
 function generateComponentSelectors() {
     const subjectSelect = document.getElementById('subject');
     const typeSelect = document.getElementById('paperType');
+    const seasonSelect = document.getElementById('season');
     const componentSelectionDiv = document.getElementById('componentSelection');
     const componentOptionsDiv = document.getElementById('componentOptions');
 
     const selectedSubject = subjectSelect.value;
     const selectedType = typeSelect.value;
+    const selectedSeason = seasonSelect.value;
     const subjectData = SUBJECT_PAPERS[selectedSubject];
 
-    let papers = [];
-    if (subjectData.hasTypes) {
-        papers = subjectData[selectedType];
-    } else {
-        papers = subjectData.papers;
-    }
-
-    console.log(`Generating component selectors for papers: ${papers}`);
+    // Check if it's March series
+    const isMarchSeries = selectedSeason && selectedSeason.includes('March');
 
     componentOptionsDiv.innerHTML = '';
 
-    papers.forEach(paper => {
-        const div = document.createElement('div');
-        div.style.marginBottom = '10px';
+    // Handle sciences with practical choice
+    if (['0610', '0620', '0625'].includes(selectedSubject)) {
+        const tierData = subjectData[selectedType];
+        
+        // MCQ Paper
+        createVariantSelector(tierData.mcq, 'MCQ', componentOptionsDiv, isMarchSeries);
+        
+        // Theory Paper
+        createVariantSelector(tierData.theory, 'Theory', componentOptionsDiv, isMarchSeries);
+        
+        // Practical Choice (5 or 6)
+        createPracticalSelector(tierData.practical, componentOptionsDiv, isMarchSeries);
+        
+    } else {
+        // Other subjects (Math, English, CompSci)
+        let papers = [];
+        if (subjectData.hasTypes) {
+            papers = subjectData[selectedType];
+        } else {
+            papers = subjectData.papers;
+        }
 
-        const label = document.createElement('label');
-        label.textContent = `Paper ${paper} - Select Variant: `;
-        label.style.display = 'inline-block';
-        label.style.width = '200px';
+        papers.forEach(paper => {
+            createVariantSelector(paper, `Paper ${paper}`, componentOptionsDiv, isMarchSeries);
+        });
+    }
 
-        const select = document.createElement('select');
-        select.id = `component_${paper}`;
-        select.className = 'component-selector';
-        select.required = true;
+    componentSelectionDiv.style.display = 'block';
+    document.getElementById('markInputs').style.display = 'none';
+}
 
+// Helper: Create variant selector for a single paper
+function createVariantSelector(paper, label, container, isMarchSeries) {
+    const div = document.createElement('div');
+    div.style.marginBottom = '10px';
+
+    const labelElem = document.createElement('label');
+    labelElem.textContent = `${label} (Paper ${paper}) - Variant: `;
+    labelElem.style.display = 'inline-block';
+    labelElem.style.width = '250px';
+
+    const select = document.createElement('select');
+    select.id = `component_${paper}`;
+    select.className = 'component-selector';
+    select.required = true;
+
+    if (isMarchSeries) {
+        // March series: only variant 2
+        const option = document.createElement('option');
+        option.value = paper + '2';
+        option.textContent = `Variant 2 (${paper}2)`;
+        option.selected = true;
+        select.appendChild(option);
+        select.disabled = true; // Lock it
+    } else {
+        // Other series: all variants
         const defaultOption = document.createElement('option');
         defaultOption.value = '';
         defaultOption.textContent = '-- Select Variant --';
@@ -184,16 +223,58 @@ function generateComponentSelectors() {
             option.textContent = `Variant ${variant} (${paper}${variant})`;
             select.appendChild(option);
         });
+    }
 
-        select.addEventListener('change', checkAllComponentsSelected);
+    select.addEventListener('change', checkAllComponentsSelected);
 
-        div.appendChild(label);
-        div.appendChild(select);
-        componentOptionsDiv.appendChild(div);
+    div.appendChild(labelElem);
+    div.appendChild(select);
+    container.appendChild(div);
+}
+
+// Helper: Create practical paper choice (5 or 6)
+function createPracticalSelector(practicalOptions, container, isMarchSeries) {
+    const div = document.createElement('div');
+    div.style.marginBottom = '10px';
+
+    const labelElem = document.createElement('label');
+    labelElem.textContent = 'Practical Paper: ';
+    labelElem.style.display = 'inline-block';
+    labelElem.style.width = '250px';
+
+    const select = document.createElement('select');
+    select.id = 'component_practical';
+    select.className = 'component-selector';
+    select.required = true;
+
+    const defaultOption = document.createElement('option');
+    defaultOption.value = '';
+    defaultOption.textContent = '-- Choose Paper 5 or 6 --';
+    select.appendChild(defaultOption);
+
+    practicalOptions.forEach(paper => {
+        if (isMarchSeries) {
+            // March: only variant 2
+            const option = document.createElement('option');
+            option.value = paper + '2';
+            option.textContent = `Paper ${paper} Variant 2 (${paper}2)`;
+            select.appendChild(option);
+        } else {
+            // Other series: all variants for each paper
+            VARIANTS.forEach(variant => {
+                const option = document.createElement('option');
+                option.value = paper + variant;
+                option.textContent = `Paper ${paper} Variant ${variant} (${paper}${variant})`;
+                select.appendChild(option);
+            });
+        }
     });
 
-    componentSelectionDiv.style.display = 'block';
-    document.getElementById('markInputs').style.display = 'none';
+    select.addEventListener('change', checkAllComponentsSelected);
+
+    div.appendChild(labelElem);
+    div.appendChild(select);
+    container.appendChild(div);
 }
 
 // ========== CHECK ALL COMPONENTS SELECTED ==========
@@ -205,24 +286,53 @@ function checkAllComponentsSelected() {
     const selectedType = typeSelect.value;
     const subjectData = SUBJECT_PAPERS[selectedSubject];
 
-    let papers = [];
-    if (subjectData.hasTypes) {
-        papers = subjectData[selectedType];
-    } else {
-        papers = subjectData.papers;
-    }
-
     selectedComponents = [];
     let allSelected = true;
 
-    papers.forEach(paper => {
-        const select = document.getElementById(`component_${paper}`);
-        if (select && select.value) {
-            selectedComponents.push(select.value);
+    if (['0610', '0620', '0625'].includes(selectedSubject)) {
+        // Sciences: check MCQ, Theory, and Practical
+        const tierData = subjectData[selectedType];
+        
+        const mcqSelect = document.getElementById(`component_${tierData.mcq}`);
+        const theorySelect = document.getElementById(`component_${tierData.theory}`);
+        const practicalSelect = document.getElementById('component_practical');
+
+        if (mcqSelect && mcqSelect.value) {
+            selectedComponents.push(mcqSelect.value);
         } else {
             allSelected = false;
         }
-    });
+
+        if (theorySelect && theorySelect.value) {
+            selectedComponents.push(theorySelect.value);
+        } else {
+            allSelected = false;
+        }
+
+        if (practicalSelect && practicalSelect.value) {
+            selectedComponents.push(practicalSelect.value);
+        } else {
+            allSelected = false;
+        }
+
+    } else {
+        // Other subjects: check all papers
+        let papers = [];
+        if (subjectData.hasTypes) {
+            papers = subjectData[selectedType];
+        } else {
+            papers = subjectData.papers;
+        }
+
+        papers.forEach(paper => {
+            const select = document.getElementById(`component_${paper}`);
+            if (select && select.value) {
+                selectedComponents.push(select.value);
+            } else {
+                allSelected = false;
+            }
+        });
+    }
 
     console.log(`Components: ${selectedComponents}, All selected: ${allSelected}`);
 
