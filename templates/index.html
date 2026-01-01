@@ -19,14 +19,20 @@
         </p>
 
         <!-- ========== MODE SELECTOR ========== -->
-        <div class="mode-selector">
-            <button type="button" id="databaseModeBtn" class="mode-btn active">📚 Database Mode</button>
-            <button type="button" id="manualModeBtn" class="mode-btn">✏️ Manual Mode</button>
+        <div class="mode-toggle-container">
+            <div class="mode-toggle">
+                <div class="toggle-slider"></div>
+                <button type="button" class="toggle-option active" data-mode="database">
+                    <span class="toggle-icon">💾</span>
+                    <span class="toggle-label">Database Mode</span>
+                </button>
+                <button type="button" class="toggle-option" data-mode="manual">
+                    <span class="toggle-icon">✏️</span>
+                    <span class="toggle-label">Manual Mode</span>
+                </button>
+            </div>
         </div>
-        
-        <p class="mode-description" id="modeDescription">
-            Using pre-loaded grade thresholds and SCWF data from Cambridge (for select subjects)
-        </p>
+        <p class="mode-description" id="modeDescription">Using pre-loaded grade thresholds and SCWF data from Cambridge (for select subjects)</p>
 
         <!-- Calculator Form -->
         <form id="calculatorForm">
