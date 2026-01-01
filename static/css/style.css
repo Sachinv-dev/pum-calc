@@ -585,37 +585,122 @@ footer {
 
 /* ========== MODE SELECTOR ========== */
 
-.mode-selector {
-    display: flex;
-    gap: 10px;
+/* ========== APPLE-STYLE MODE TOGGLE ========== */
+.mode-toggle-container {
     margin: 30px 0 15px 0;
-    border-bottom: 2px solid var(--border);
-    padding-bottom: 0;
+    display: flex;
+    justify-content: center;
 }
 
-.mode-btn {
+.mode-toggle {
+    position: relative;
+    display: inline-flex;
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 50px;
+    padding: 4px;
+    gap: 4px;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+.toggle-slider {
+    position: absolute;
+    top: 4px;
+    left: 4px;
+    width: calc(50% - 4px);
+    height: calc(100% - 8px);
+    background: linear-gradient(135deg, 
+        rgba(255, 255, 255, 0.95) 0%, 
+        rgba(255, 255, 255, 0.85) 100%);
+    border-radius: 46px;
+    transition: transform 0.35s cubic-bezier(0.4, 0.0, 0.2, 1);
+    box-shadow: 
+        0 2px 8px rgba(0, 0, 0, 0.15),
+        0 1px 2px rgba(0, 0, 0, 0.1);
+    z-index: 1;
+}
+
+.toggle-option {
+    position: relative;
+    z-index: 2;
     flex: 1;
-    padding: 15px 20px;
+    padding: 12px 28px;
     font-family: 'Recursive', monospace;
-    font-size: 0.95em;
+    font-size: 0.9em;
     font-weight: 600;
     background: transparent;
-    color: var(--fg-light);
-    opacity: 0.5;
     border: none;
-    border-bottom: 3px solid transparent;
     cursor: pointer;
-    transition: all 0.3s ease;
-    margin-bottom: -2px;
+    transition: color 0.35s cubic-bezier(0.4, 0.0, 0.2, 1);
+    color: rgba(255, 255, 255, 0.5);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    white-space: nowrap;
+    border-radius: 46px;
 }
 
-.mode-btn:hover {
-    opacity: 0.8;
+.toggle-option.active {
+    color: #0a0a0e;
 }
 
-.mode-btn.active {
-    opacity: 1;
-    border-bottom-color: var(--accent-gold);
+.toggle-option:hover:not(.active) {
+    color: rgba(255, 255, 255, 0.75);
+}
+
+.toggle-icon {
+    font-size: 1.1em;
+    display: inline-block;
+}
+
+.toggle-label {
+    font-weight: 600;
+}
+
+/* Slider animation when manual mode is active */
+.mode-toggle.manual-active .toggle-slider {
+    transform: translateX(calc(100% + 4px));
+}
+
+.mode-description {
+    font-size: 0.9em;
+    opacity: 0.7;
+    margin-bottom: 30px;
+    padding: 15px;
+    background: rgba(255, 215, 100, 0.05);
+    border-left: 3px solid var(--accent-gold);
+    border-radius: 4px;
+    text-align: center;
+    transition: opacity 0.3s ease;
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+    .toggle-option {
+        padding: 10px 20px;
+        font-size: 0.85em;
+        gap: 6px;
+    }
+    
+    .toggle-label {
+        display: none;
+    }
+    
+    .toggle-icon {
+        font-size: 1.3em;
+    }
+}
+
+@media (max-width: 480px) {
+    .mode-toggle {
+        width: 100%;
+        max-width: 200px;
+    }
+    
+    .toggle-option {
+        padding: 10px 16px;
+    }
 }
 
 .mode-description {
