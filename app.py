@@ -12,8 +12,13 @@ app = Flask(__name__)
 
 # ========== CONFIGURATION ==========
 # UPDATE THESE PATHS TO YOUR ACTUAL FILE LOCATIONS
-BASE_PATH = r"D:\sachin (D)\Code\Python\Random files\Grade Thresholds"
-SCWF_PATH = r"D:\sachin (D)\Code\Python\Random files\SCWF factors"
+
+# Get the directory where app.py is located
+BASE_DIR = os.path.abspath(os.path.dirname(__file__))
+
+# Build paths relative to app.py location
+BASE_PATH = os.path.join(BASE_DIR, 'static', 'data', 'thresholds')
+SCWF_PATH = os.path.join(BASE_DIR, 'static', 'data', 'scwf')
 
 # ========== DATA MAPPINGS ==========
 
